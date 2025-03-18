@@ -1,3 +1,1 @@
-# My Webpack Template 
-
-Run ```npm istall``` to set up.
+# Project Todo List from "The Odin Project"
