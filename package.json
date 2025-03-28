@@ -13,5 +13,9 @@
     "build": "webpack --config webpack.prod.js",
     "dev": "webpack serve --config webpack.dev.js",
     "deploy": "git subtree push --prefix dist origin gh-pages"
+  },
+  "dependencies": {
+    "process": "^0.11.10",
+    "url": "^0.11.4"
   }
 }
