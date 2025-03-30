@@ -9,9 +9,22 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     clean: true,
   },
+  resolve: {
+    fallback: {
+      url: require.resolve("url/"),
+      worker_threads: false, // not available in browser
+      fs: false,
+      path: false,
+      os: false,
+      stream: false,
+    },
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: "./src/template.html",
+    }),
+    new webpack.ProvidePlugin({
+      process: "process/browser",
     }),
   ],
   module: {

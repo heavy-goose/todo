@@ -1,6 +1,6 @@
 import "./styles.css";
 import { logic } from "./logic.js"
-import { ids } from "webpack";
+
 
 const dom = {
     init: function() {
@@ -44,7 +44,8 @@ const dom = {
         
         this.svgUnchecked = `<svg data-value="checkbox" id="icon-unchecked-box" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>checkbox-blank-outline</title><path data-value="checkbox" d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,5V19H5V5H19Z" /></svg>`;
         this.svgChecked = `<svg data-value="checkbox" id="icon-checked-box" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>checkbox-outline</title><path data-value="checkbox" d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,5V19H5V5H19M10,17L6,13L7.41,11.58L10,14.17L16.59,7.58L18,9" /></svg>`;
-    
+        this.projectDeleteSvg = `<svg data-value="delete-project" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>trash-can-outline</title><path d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z" /></svg>`
+        
         this.sidebar = document.querySelector(".sidebar");
         this.completed = this.sidebar.querySelector("#completed");
         this.inbox = this.sidebar.querySelector("#default");
@@ -60,26 +61,69 @@ const dom = {
         this.editForm.addEventListener("submit", (e) => this.handleEditSubmit(e));
         this.completed.addEventListener("click", () => this.changeProject("completed"));
         this.inbox.addEventListener("click", () => this.changeProject("default"));
-        // this.addProject.addEventListener("click", () => this.projectModal.showModal());
-        // this.projectForm.addEventListener("submit", (e) => this.handleProjectSubmit(e));
-        // this.closeProjectModalButton.addEventListener("click", () => this.projectModal.close());
+        this.addProject.addEventListener("click", () => this.projectModal.showModal());
+        this.projectForm.addEventListener("submit", (e) => this.handleProjectSubmit(e));
+        this.closeProjectModalButton.addEventListener("click", () => this.projectModal.close());
+        this.projectTitle.addEventListener("input", () => this.projectTitle.setCustomValidity(''));
         
     },
-    // handleProjectSubmit: function(e) {
-    //     e.preventDefault();
-    //     const newProject = this.projectTitle.value;
-    //     // check if title already exist and guard against naming project "Inbox", "default", or "completed"
-    //     // if title invalid, prompt user to enter new title
+    handleProjectSubmit: function(e) {
+        e.preventDefault();
+        const newProject = this.projectTitle.value;
+        const formattedProject = newProject.toLowerCase().split(" ").join("-");
+        const reservedNames = ['inbox', 'default', 'completed'];
 
-    //     // if title valid continue
+        // Custom Validity Checks
+        this.projectTitle.setCustomValidity('');
 
-    //     logic.createProject(newProject);
+        if (!newProject) {
+          this.projectTitle.setCustomValidity("Please enter a project name.");
+        } else if (logic.projects[newProject]) {
+          this.projectTitle.setCustomValidity("Project already exists.");
+        } else if (reservedNames.includes(newProject.toLowerCase())) {
+          this.projectTitle.setCustomValidity(`"${newProject}" is a reserved name.`);
+        }
 
-    //     // create project button
-    //     const newProjectButton = document.createElement("li");
-    //     newProjectButton.innerText = newProject;
-    //     newProjectButton.setAttribute("id", newProject.toLowerCase().split(" ").join("-"));
-    // },
+        if (!this.projectTitle.checkValidity()) {
+          this.projectTitle.reportValidity();
+          return;
+        }
+
+        this.projectTitle.value = "";
+        logic.createProject(formattedProject);
+
+        // create project row elements
+        const newProjectDiv = document.createElement("div");
+        newProjectDiv.classList.add("project-row");
+        newProjectDiv.setAttribute("data-project-name", formattedProject);
+        newProjectDiv.innerHTML = this.projectDeleteSvg;
+
+        const newProjectButton = document.createElement("li");
+        newProjectButton.setAttribute("data-project-name", formattedProject);
+
+        newProjectButton.innerText = newProject;
+        newProjectDiv.appendChild(newProjectButton);
+        newProjectDiv.addEventListener("click", (e) => this.handleProjectRowClick(e));
+
+        // add to dom
+        this.addProject.parentNode.insertBefore(newProjectDiv, this.addProject);
+        this.projectModal.close();
+    },
+    handleProjectRowClick: function(e) {
+        let tag = e.target.tagName.toLowerCase();
+        console.log(tag); // "svg" or "div" "li"
+        if (tag === "svg" || tag === "path") {
+            
+            const row = e.target.closest("div");
+            const name = row.dataset.projectName;
+
+            logic.removeProject(name);
+            row.remove();
+            this.display(logic.currentProject);
+        } else if (tag === "li") {
+            this.changeProject(e.target.dataset.projectName);
+        }
+    },
     changeProject: function(project) {
         logic.currentProject = project;
         this.display(logic.currentProject);
@@ -160,7 +204,7 @@ const dom = {
     },
     display: function(project) {
         this.todoContainer.innerHTML = "";
-        this.currentProject.innerText = (project === "default") ? "Inbox" : project;
+        this.currentProject.innerText = (project === "default") ? "INBOX" : project.toUpperCase().split("-").join(" ");
         let displayProject = logic.projects[project];
         for (let itemId in displayProject) {
             let checked = displayProject[itemId].completed;

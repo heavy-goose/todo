@@ -64,7 +64,10 @@ export const logic = {
     },
     removeProject: function(project) {
         if (project === "completed") return console.log("Can't touch this ⚠️");
-        if (this.projects[project]) delete this.projects[project];
+        if (this.projects[project]) {
+            delete this.projects[project];
+            this.currentProject = "default";
+        } 
     },
     createProject: function(newProject) {
         if (!this.projects[newProject]) this.projects[newProject] = {};

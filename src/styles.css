@@ -33,26 +33,28 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: center;
-    padding: 40px 0;
+    align-items: flex-start;
+    padding: 40px 5px;
     font-size: 1.2rem;
-
 }
 
 .sidebar ul {
     display: flex;
     flex-direction: column;
+    align-items: flex-end;
     gap: 2rem;
     height: 100%;
 }
 
-.sidebar li {
-    cursor: pointer;
-}
 
 li#default {
+    margin-left: 25px;
     background-color: var(--action-color);
     border-color: #4057a1c9;
+}
+
+li#default:hover {
+    border-color: #ffffff96;
 }
 
 li#completed {
@@ -60,6 +62,10 @@ li#completed {
     margin-top: auto;
     background-color: rgb(26, 138, 4);
     border-color: rgba(26, 138, 4, 0.76);
+}
+
+li#completed:hover {
+    border-color: #ffffff96;
 }
 
 li#add-project {
@@ -83,6 +89,31 @@ li#add-project:hover {
     padding: 5px 10px;
     background-color: var(--warm-yellow);
     color: var(--background);
+    cursor: pointer;
+    width: 130px;
+}
+
+.project-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.project-row li:hover {
+    background-color: #eba308c2;
+}
+
+.project-row svg {
+    visibility: hidden;
+    cursor: pointer;
+    fill:rgba(4, 19, 34, 0.568)
+}
+.project-row:hover svg {
+    visibility: visible;
+}
+
+.project-row svg:hover {
+    fill:rgb(165, 4, 4);
 }
 
 .header {
@@ -98,6 +129,7 @@ li#add-project:hover {
     padding: 20px 30px;
     display: grid;
     grid-template-rows: min-content min-content 1fr;
+    gap: 15px;
 }
 
 .todo-container {
@@ -155,16 +187,26 @@ li#add-project:hover {
     fill: rgb(165, 4, 4)
 }
 
-
-
 .current-project {
     font-family: Cutive, Georgia, 'Times New Roman', Times, serif;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
 }
 
 .footer {
     grid-area: 3 / 1 / 4 / 3;
     background-color: var(--action-color);
+    color: whitesmoke;
+    display: grid;
+    place-content: center;
+}
+
+.footer a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.footer a:hover {    
+    color: rgba(245, 245, 245, 0.61);
 }
 
 /* Style for the modals */
